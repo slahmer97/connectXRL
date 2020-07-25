@@ -42,13 +42,12 @@ class RLAgent:
         model.compile(loss='mse', optimizer=Adam(lr=lrt))  # TODO tune lr, check other loss functions
         return model
 
-    def step(self, observation):
+    def step(self, state):
         rand_tmp = np.random.random()
         if rand_tmp <= self.epsilon:
             return np.random.randint(0, 6)
-        self.tmp += 1
-        action = 0
-        return action
+
+        return np.argmax(self.model.predict(state)[0])
 
     def enhance(self, current_state, action, reward, next_state, is_final):
         data = {
