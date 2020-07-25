@@ -26,7 +26,7 @@ that has the maximum value.
 env = make("connectx", debug=True)
 trainer = env.train([None, "random"])
 agent = agt.RLAgent()
-for _ in range(5):
+for _ in range(15):
     observation = trainer.reset()
     while not env.done:
         current_state_ = np.reshape(observation.board, [1, 7 * 6])

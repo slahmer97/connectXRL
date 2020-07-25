@@ -10,6 +10,7 @@ from tensorflow.keras.optimizers import Adam
 class RLAgent:
 
     def __init__(self):
+        self.counter = 0
         self.tmp = 0
         self.data_set = deque(maxlen=5000)
         self.learning_rate = 0.001
@@ -42,6 +43,7 @@ class RLAgent:
         # TODO make sure to use the right activation function for output layer
         model.add(Dense(action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=lrt))  # TODO tune lr, check other loss functions
+        model.summary()
         return model
 
     def step(self, state):
@@ -62,31 +64,32 @@ class RLAgent:
         self.data_set.append(data)
 
     def convertDS(self, minibatch):
-        X = []
-        Y = []
-
+        X = np.array([])
+        Y = np.array([])
+        c = 0
         for cur_state, action, reward, next_state, is_final in minibatch:
+            c += 1
             # Q(S,a) = reward + gamma * argmax(Next_State)
             ret = self.model.predict(cur_state)[0]
             ret[action] = reward
             if not is_final:
                 ret[action] += self.gamma * np.amax(self.model.predict(next_state)[0])
-            X.append(action)
-            Y.append(ret)
-        return np.array(X), np.array(Y)
+            X = np.append(X, cur_state)
+            Y = np.append(Y, ret)
+
+        return X.reshape((c, 42)), Y.reshape((c, 7))
 
     def learn(self):
         if len(self.data_set) < self.batch_size + 10:
             return
+        self.counter += 1
         self.epsilon = min(self.epsilon, self.epsilon * self.decay)
 
         mini_batch = random.sample(self.data_set, self.batch_size)
 
         X, Y = self.convertDS(minibatch=mini_batch)
-        print(Y)
-        print(X.shape)
-        print(Y.shape)
-        # TODO ddd
+        print("Epoch : {}".format(self.counter))
+        self.model.fit(X, Y)
 
     def load(self, name):
         self.model.load_weights(name)
