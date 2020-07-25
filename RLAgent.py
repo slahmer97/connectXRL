@@ -5,10 +5,10 @@ from collections import deque
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import activations
 
 
 class RLAgent:
-
     def __init__(self):
         self.counter = 0
         self.tmp = 0
@@ -34,14 +34,14 @@ class RLAgent:
         return res
 
     @staticmethod
-    def model_builder(input_size=7 * 6, action_size=7, lrt=0.008):
+    def model_builder(input_size=7 * 6, action_size=7, lrt=0.001):
         # TODO improve the model
         model = Sequential()
         model.add(Dense(24, input_dim=input_size, activation='relu'))
         model.add(Dense(24, activation='relu'))
 
         # TODO make sure to use the right activation function for output layer
-        model.add(Dense(action_size, activation='linear'))
+        model.add(Dense(action_size, activation=activations.linear))
         model.compile(loss='mse', optimizer=Adam(lr=lrt))  # TODO tune lr, check other loss functions
         model.summary()
         return model
