@@ -47,7 +47,8 @@ class RLAgent:
         action = 0
         return action
 
-    def enhance(self, state, q_state):
+    def enhance(self, current_state, action, reward, next_state):
+
         pass
 
     def learn(self):
