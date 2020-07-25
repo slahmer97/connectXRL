@@ -30,14 +30,16 @@ for _ in range(1):
     trainer = env.train([None, "random"])
     observation = trainer.reset()
     while not env.done:
-        my_action = agent.step(observation, env.configuration)
+        current_state_ = np.reshape(observation.board, [1, 7 * 6])
+        my_action = agent.step(current_state_)
 
         next_state, reward, done, info = trainer.step(my_action)
 
-        print(next_state.board)
-        print(observation.board)
-        agent.enhance(np.reshape(observation.board, [1, 7 * 6]), my_action,
-                      reward, np.reshape(next_state.board, [1, 7 * 6]))
+        next_state_ = np.reshape(next_state.board, [1, 7 * 6])
+
+        print(current_state_)
+        print(next_state_)
+        agent.enhance(current_state_, my_action, reward, next_state_, env.done)
 
         agent.learn()
         observation = next_state

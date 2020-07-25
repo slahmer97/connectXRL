@@ -42,17 +42,26 @@ class RLAgent:
         model.compile(loss='mse', optimizer=Adam(lr=lrt))  # TODO tune lr, check other loss functions
         return model
 
-    def step(self, observation, configuration):
+    def step(self, observation):
+        rand_tmp = np.random.random()
+        if rand_tmp <= self.epsilon:
+            return np.random.randint(0, 6)
         self.tmp += 1
         action = 0
         return action
 
-    def enhance(self, current_state, action, reward, next_state):
-
-        pass
+    def enhance(self, current_state, action, reward, next_state, is_final):
+        data = {
+            "current_state": current_state,
+            "action": action,
+            "reward": reward,
+            "next_state": next_state,
+            "is_final": is_final
+        }
+        self.data_set.append(data)
 
     def learn(self):
-        pass
+        self.epsilon = min(self.epsilon, self.epsilon * self.decay)
 
 
 """
