@@ -60,6 +60,13 @@ class RLAgent:
         }
         self.data_set.append(data)
 
+    @staticmethod
+    def convertDS(minibatch):
+        X = None
+        Y = None
+
+        return X, Y
+
     def learn(self):
         if len(self.data_set) < self.batch_size:
             return
@@ -67,7 +74,9 @@ class RLAgent:
 
         mini_batch = np.random.sample(self.data_set, self.batch_size)
 
-        #TODO ddd
+        X, Y = RLAgent.convertDS(minibatch=mini_batch)
+
+        # TODO ddd
 
     def load(self, name):
         self.model.load_weights(name)
