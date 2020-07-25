@@ -12,13 +12,13 @@ class RLAgent:
     def __init__(self):
         self.counter = 0
         self.tmp = 0
-        self.data_set = deque(maxlen=5000)
+        self.data_set = deque(maxlen=10000)
         self.learning_rate = 0.001
         self.epsilon = 1.0
         self.decay = 0.99
-        self.min_epsilon = 0.001
+        self.min_epsilon = 0.01
         self.model = RLAgent.model_builder(lrt=self.learning_rate)
-        self.batch_size = 30
+        self.batch_size = 100
         self.gamma = 0.1
         # TODO bla bla
         pass
@@ -80,7 +80,7 @@ class RLAgent:
         return X.reshape((c, 42)), Y.reshape((c, 7))
 
     def learn(self):
-        if len(self.data_set) < self.batch_size + 10:
+        if len(self.data_set) < self.batch_size + 100:
             return
         self.counter += 1
         self.epsilon = min(self.epsilon, self.epsilon * self.decay)
@@ -89,7 +89,7 @@ class RLAgent:
 
         X, Y = self.convertDS(minibatch=mini_batch)
         print("Epoch : {}".format(self.counter))
-        self.model.fit(X, Y)
+        self.model.fit(X, Y, verbose=1)
 
     def load(self, name):
         self.model.load_weights(name)
