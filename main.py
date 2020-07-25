@@ -26,7 +26,7 @@ that has the maximum value.
 env = make("connectx", debug=True)
 trainer = env.train([None, "random"])
 agent = agt.RLAgent()
-for _ in range(1):
+for _ in range(5):
     observation = trainer.reset()
     while not env.done:
         current_state_ = np.reshape(observation.board, [1, 7 * 6])
@@ -35,7 +35,6 @@ for _ in range(1):
         next_state, reward, done, info = trainer.step(my_action)
 
         next_state_ = np.reshape(next_state.board, [1, 7 * 6])
-
 
         agent.enhance(current_state_, my_action, reward, next_state_, env.done)
 

@@ -18,6 +18,7 @@ class RLAgent:
         self.min_epsilon = 0.001
         self.model = RLAgent.model_builder(lrt=self.learning_rate)
         self.batch_size = 30
+        self.gamma = 0.1
         # TODO bla bla
         pass
 
@@ -51,31 +52,40 @@ class RLAgent:
         return np.argmax(self.model.predict(state)[0])
 
     def enhance(self, current_state, action, reward, next_state, is_final):
-        data = {
-            "current_state": current_state,
-            "action": action,
-            "reward": reward,
-            "next_state": next_state,
-            "is_final": is_final
-        }
+        data = (
+            current_state,
+            action,
+            reward,
+            next_state,
+            is_final
+        )
         self.data_set.append(data)
 
-    @staticmethod
-    def convertDS(minibatch):
-        X = None
-        Y = None
+    def convertDS(self, minibatch):
+        X = []
+        Y = []
 
-        return X, Y
+        for cur_state, action, reward, next_state, is_final in minibatch:
+            # Q(S,a) = reward + gamma * argmax(Next_State)
+            ret = self.model.predict(cur_state)[0]
+            ret[action] = reward
+            if not is_final:
+                ret[action] += self.gamma * np.amax(self.model.predict(next_state)[0])
+            X.append(action)
+            Y.append(ret)
+        return np.array(X), np.array(Y)
 
     def learn(self):
-        if len(self.data_set) < self.batch_size:
+        if len(self.data_set) < self.batch_size + 10:
             return
         self.epsilon = min(self.epsilon, self.epsilon * self.decay)
 
-        mini_batch = np.random.sample(self.data_set, self.batch_size)
+        mini_batch = random.sample(self.data_set, self.batch_size)
 
-        X, Y = RLAgent.convertDS(minibatch=mini_batch)
-
+        X, Y = self.convertDS(minibatch=mini_batch)
+        print(Y)
+        print(X.shape)
+        print(Y.shape)
         # TODO ddd
 
     def load(self, name):
