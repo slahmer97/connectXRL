@@ -6,6 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 
+
 class RLAgent:
 
     def __init__(self):
@@ -20,6 +21,16 @@ class RLAgent:
         pass
 
     @staticmethod
+    def get_possible_actions(board):
+        tmp = np.reshape(board, (6, 7))
+        for i in tmp:
+            for j in i:
+                print("{} ".format(j), end="")
+            print()
+        res = []
+        return res
+
+    @staticmethod
     def model_builder(input_size=7 * 6, action_size=7, lrt=0.008):
         # TODO improve the model
         model = Sequential()
@@ -32,7 +43,7 @@ class RLAgent:
         return model
 
     def step(self, observation, configuration):
-        self.tmp +=1
+        self.tmp += 1
         action = 0
         return action
 
@@ -41,3 +52,15 @@ class RLAgent:
 
     def learn(self):
         pass
+
+
+"""
+model = model_builder()
+predicted = model.predict(t)
+action = 0
+observation, reward, done, info = trainer.step(action)
+predicted[0][action] = -100 + 0.8 * np.amax(model.predict(np.reshape(observation.board, [1, 7 * 6]))[0])
+print(predicted)
+model.fit(t, predicted, epochs=1)
+
+"""
