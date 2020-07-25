@@ -31,13 +31,12 @@ for _ in range(1):
     while not env.done:
         current_state_ = np.reshape(observation.board, [1, 7 * 6])
         my_action = agent.step(current_state_)
-
+        print(my_action)
         next_state, reward, done, info = trainer.step(my_action)
 
         next_state_ = np.reshape(next_state.board, [1, 7 * 6])
 
-        print(current_state_)
-        print(next_state_)
+
         agent.enhance(current_state_, my_action, reward, next_state_, env.done)
 
         agent.learn()

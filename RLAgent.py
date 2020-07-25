@@ -17,6 +17,7 @@ class RLAgent:
         self.decay = 0.99
         self.min_epsilon = 0.001
         self.model = RLAgent.model_builder(lrt=self.learning_rate)
+        self.batch_size = 30
         # TODO bla bla
         pass
 
@@ -60,7 +61,19 @@ class RLAgent:
         self.data_set.append(data)
 
     def learn(self):
+        if len(self.data_set) < self.batch_size:
+            return
         self.epsilon = min(self.epsilon, self.epsilon * self.decay)
+
+        mini_batch = np.random.sample(self.data_set, self.batch_size)
+
+        #TODO ddd
+
+    def load(self, name):
+        self.model.load_weights(name)
+
+    def save(self, name):
+        self.model.save_weights(name)
 
 
 """
