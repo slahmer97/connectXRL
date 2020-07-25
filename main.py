@@ -66,6 +66,7 @@ while not env.done:
 
     next_state, reward, done, info = trainer.step(my_action)
 
-    print("-------------- My Action {} : ".format(my_action), info, done, reward)
-
-    print(env.render(mode="ansi"))
+    state = 0
+    q_state = 0
+    agent.enhance(state, q_state)
+    agent.learn()
