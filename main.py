@@ -2,12 +2,8 @@ from kaggle_environments import evaluate, make, utils
 import random
 import gym
 import numpy as np
-from collections import deque
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.optimizers import Adam
-import os
 
+import RLAgent as agt
 """
 NN specification : 
 NN used as value-action function approximation.
@@ -45,24 +41,16 @@ def get_possible_actions(board):
 
 
 # Model builder
-def model_builder(input_size=7 * 6, action_size=7, lrt=0.008):
-    # TODO improve the model
-    model = Sequential()
-    model.add(Dense(24, input_dim=input_size, activation='relu'))
-    model.add(Dense(24, activation='relu'))
 
-    # TODO make sure to use the right activation function for output layer
-    model.add(Dense(action_size, activation='linear'))
-    model.compile(loss='mse', optimizer=Adam(lr=lrt))  # TODO tune lr, check other loss functions
-    return model
-
-
-data_set = deque(maxlen=5000)
 
 env.reset()
 trainer = env.train([None, "random"])
+observation = trainer.reset()
 t = np.reshape(trainer.reset().board, [1, 7 * 6])
 
+
+exit()
+"""
 model = model_builder()
 predicted = model.predict(t)
 action = 0
@@ -70,19 +58,14 @@ observation, reward, done, info = trainer.step(action)
 predicted[0][action] = -100 + 0.8 * np.amax(model.predict(np.reshape(observation.board, [1, 7 * 6]))[0])
 print(predicted)
 model.fit(t, predicted, epochs=1)
-print(model.predict(t)[0])
 
-exit(1)
-
-trainer.reset()
-observation, reward, done, info = trainer.step(0)
-get_possible_actions(observation.board)
-exit()
+"""
+agent = agt.RLAgent()
 while not env.done:
-    my_action = my_agent(observation, env.configuration)
+    my_action = agent.step(observation, env.configuration)
 
     next_state, reward, done, info = trainer.step(my_action)
-    data_set.
+
     print("-------------- My Action {} : ".format(my_action), info, done, reward)
 
     print(env.render(mode="ansi"))
