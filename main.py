@@ -2,8 +2,9 @@ from kaggle_environments import evaluate, make, utils
 import random
 import gym
 import numpy as np
-
+import os
 import RLAgent as agt
+import sys
 
 """
 NN specification : 
@@ -25,17 +26,45 @@ that has the maximum value.
 
 env = make("connectx", debug=True)
 trainer = env.train([None, "random"])
+print(trainer.reset())
 agent = agt.RLAgent()
-for _ in range(1000):
+wins = 0
+losts = 0
+
+for i in range(50000):
     observation = trainer.reset()
+    msg = "lost"
+    br = False
     while not env.done:
         current_state_ = np.reshape(observation.board, [1, 7 * 6])
         my_action = agent.step(current_state_)
         next_state, reward, done, info = trainer.step(my_action)
-
+        if reward is None:
+            reward = -2
         next_state_ = np.reshape(next_state.board, [1, 7 * 6])
-
-        agent.enhance(current_state_, my_action, reward, next_state_, env.done)
+        if reward is not None:
+            agent.enhance(current_state_, my_action, reward, next_state_, env.done)
+        else:
+            agent.enhance(current_state_, my_action, -1, None, True)
 
         agent.learn()
         observation = next_state
+        if env.done:
+            if reward == 1:
+                wins += 1
+            else:
+                losts += 1
+        if br:
+            print("break")
+            break
+        import sys
+
+        sys.stdout.flush()
+    if i % 200 == 0:
+        wins = 0
+        losts = 0
+
+    print("[+] Episode {} -- 200 Last (Wins VS Losts) : ({} - {})  -- epsilon : {}".format(i + 1, wins, losts,
+                                                                                           agent.epsilon))
+
+agent.save("model")

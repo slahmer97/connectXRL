@@ -6,22 +6,23 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import activations
+from tensorflow.keras import initializers
 
 
 class RLAgent:
     def __init__(self):
         self.counter = 0
         self.tmp = 0
-        self.data_set = deque(maxlen=10000)
+        self.max_len = 1024*32
+        self.data_set = deque(maxlen=self.max_len)
         self.learning_rate = 0.001
         self.epsilon = 1.0
-        self.decay = 0.99
+        self.decay = 0.99999
         self.min_epsilon = 0.01
         self.model = RLAgent.model_builder(lrt=self.learning_rate)
-        self.batch_size = 100
-        self.gamma = 0.1
+        self.batch_size = 128
+        self.gamma = 0.9
         # TODO bla bla
-        pass
 
     @staticmethod
     def get_possible_actions(board):
@@ -34,11 +35,29 @@ class RLAgent:
         return res
 
     @staticmethod
-    def model_builder(input_size=7 * 6, action_size=7, lrt=0.001):
+    def model_builder(input_size=7 * 6, action_size=7, lrt=0.01):
         # TODO improve the model
         model = Sequential()
-        model.add(Dense(24, input_dim=input_size, activation='relu'))
-        model.add(Dense(24, activation='relu'))
+        model.add(
+            Dense(24,
+                  kernel_initializer=initializers.Zeros(),
+                  bias_initializer=initializers.Zeros(),
+                  input_dim=input_size, activation='relu')
+        )
+
+        model.add(
+            Dense(24,
+                  kernel_initializer=initializers.Zeros(),
+                  bias_initializer=initializers.Zeros(),
+                  input_dim=input_size, activation='relu')
+        )
+
+        model.add(
+            Dense(24,
+                  kernel_initializer=initializers.Zeros(),
+                  bias_initializer=initializers.Zeros(),
+                  input_dim=input_size, activation='relu')
+        )
 
         # TODO make sure to use the right activation function for output layer
         model.add(Dense(action_size, activation=activations.linear))
@@ -80,7 +99,7 @@ class RLAgent:
         return X.reshape((c, 42)), Y.reshape((c, 7))
 
     def learn(self):
-        if len(self.data_set) < self.batch_size + 100:
+        if len(self.data_set) < self.batch_size * 4:
             return
         self.counter += 1
         self.epsilon = min(self.epsilon, self.epsilon * self.decay)
@@ -88,8 +107,8 @@ class RLAgent:
         mini_batch = random.sample(self.data_set, self.batch_size)
 
         X, Y = self.convertDS(minibatch=mini_batch)
-        print("Epoch : {}".format(self.counter))
-        self.model.fit(X, Y, verbose=1)
+
+        self.model.fit(X, Y, verbose=1, epochs=1, batch_size=32)
 
     def load(self, name):
         self.model.load_weights(name)
